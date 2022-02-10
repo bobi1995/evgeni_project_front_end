@@ -65,7 +65,7 @@ const PremiumSubs = (props) => {
                 width: 230,
               }}
             >
-              {props.data}
+              {props.data ? props.data : "Няма въведено"}
             </Typography>
           </Grid>
           <Grid item></Grid>

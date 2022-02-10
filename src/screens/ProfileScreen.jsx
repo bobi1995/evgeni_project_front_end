@@ -17,8 +17,8 @@ import {
 import history from "../components/history";
 import SearchIcon from "@material-ui/icons/Search";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
-import { useQuery, gql } from "@apollo/client";
-import { GET_USER } from "../graphql/queries";
+import axios from "axios";
+import apiAddress from "../globals/apiAddress";
 
 const useStyles = makeStyles(() => ({
   containerStyle: {
@@ -38,20 +38,33 @@ const useStyles = makeStyles(() => ({
 const Profile = (props) => {
   const classes = useStyles();
   const [alertMessage, setAlertMessage] = useState("");
-  const { error, loading, data } = useQuery(GET_USER, {
-    variables: { userId: localStorage.getItem("userId") },
-  });
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
-
+    setLoading(true);
+    axios
+      .get(`${apiAddress}/user/${localStorage.getItem("userId")}`, {
+        headers: {
+          Authorization: "Basic " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+      .then((res) => {
+        setData(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setAlertMessage("Потребителят не може да бъде зареден");
+      });
+  }, []);
   return (
     <Box className={classes.container}>
       {data ? (
         <Box className={classes.containerStyle}>
           <Typography style={{ fontSize: 27, fontFamily: "Open Sans" }}>
-            {data.getUser.name}
+            {data.name}
           </Typography>
           <Typography
             style={{
@@ -61,7 +74,7 @@ const Profile = (props) => {
               fontFamily: "Open Sans",
             }}
           >
-            {data.getUser.email}
+            {data.email}
           </Typography>
 
           <MaterialTable
@@ -110,17 +123,14 @@ const Profile = (props) => {
                 title: "Отвори",
                 render: (rowData) => (
                   <Button
-                    onClick={() => {
-                      props.setSelected("Проект");
-                      props.setProject(rowData._id);
-                    }}
+                    onClick={() => history.push(`/project/${rowData._id}`)}
                   >
                     Отвори
                   </Button>
                 ),
               },
             ]}
-            data={data.getUser.projects.map((el) => ({ ...el }))}
+            data={data.projects.map((el) => ({ ...el }))}
             options={{
               exportButton: true,
               sorting: false,

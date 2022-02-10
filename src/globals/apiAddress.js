@@ -1,3 +1,3 @@
-const address = "http://localhost:4000/graphql"; //test
+const address = "http://localhost:4001"; //test
 
 export default address;

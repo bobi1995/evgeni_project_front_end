@@ -7,36 +7,20 @@ import StarHalfIcon from "@material-ui/icons/StarHalf";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import YourProjects from "../screens/YourProjects";
 import ProfileScreen from "../screens/ProfileScreen";
+import CreateUserScreen from "../screens/CreateUserScreen";
 import React, { useState } from "react";
 import Header from "./Header";
 import SingOutBtn from "./SignOutBtn";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import IndividualProject from "../screens/IndividualProject";
-const SideBar = () => {
+import CreateProjectScreen from "../screens/CreateProjectScreen";
+import CreateNewFolderIcon from "@material-ui/icons/CreateNewFolder";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import history from "../components/history";
+const SideBar = (props) => {
   const [selected, setSelected] = useState("Профил");
-  const [project, setProject] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [openSignOut, setOpenSignOut] = useState(false);
-
-  const renderPage = (component) => {
-    switch (component) {
-      case "Твоите Проекти":
-        return <YourProjects />;
-      case "Профил":
-        return (
-          <ProfileScreen setSelected={setSelected} setProject={setProject} />
-        );
-      case "Filter":
-        return;
-      case "Compare":
-        return;
-
-      case "Проект":
-        return <IndividualProject project={project} />;
-      default:
-        break;
-    }
-  };
 
   return (
     <div>
@@ -51,36 +35,45 @@ const SideBar = () => {
       >
         <SideNav.Toggle />
         <SideNav.Nav defaultSelected="home">
-          <NavItem eventKey="Профил">
+          <NavItem eventKey="Профил" onClick={() => history.push("/profile")}>
             <NavIcon>
               <AccountCircleIcon />
             </NavIcon>
             <NavText>Профил</NavText>
           </NavItem>
-          <NavItem eventKey="Твоите Проекти">
+          <NavItem
+            eventKey="Твоите Проекти"
+            onClick={() => history.push("/create-user")}
+          >
             <NavIcon>
               <DashboardIcon />
             </NavIcon>
             <NavText>Твоите Проекти</NavText>
           </NavItem>
-          <NavItem eventKey="Проект" disabled={true}>
+          <NavItem
+            eventKey="Създай Проект"
+            onClick={() => history.push("/create-project")}
+          >
             <NavIcon>
-              <SearchIcon />
+              <CreateNewFolderIcon />
             </NavIcon>
-            <NavText>Проект</NavText>
+            <NavText>Създай Проект</NavText>
           </NavItem>
-          <NavItem eventKey="Compare">
+          <NavItem
+            eventKey="Създай Потребител"
+            onClick={() => history.push("/create-user")}
+          >
             <NavIcon>
-              <StarHalfIcon />
+              <PersonAddIcon />
             </NavIcon>
-            <NavText>Compare</NavText>
+            <NavText>Създай Потребител</NavText>
           </NavItem>
 
           <NavItem eventKey="SingOut">
             <NavIcon onClick={() => setOpenSignOut(true)}>
               <ExitToAppIcon />
             </NavIcon>
-            <NavText onClick={() => setOpenSignOut(true)}>Sign Out</NavText>
+            <NavText onClick={() => setOpenSignOut(true)}>Излез</NavText>
           </NavItem>
         </SideNav.Nav>
       </SideNav>
@@ -96,7 +89,7 @@ const SideBar = () => {
             marginLeft: expanded ? 240 : 64,
           }}
         >
-          {renderPage(selected)}
+          {props.children}
         </div>
       </div>
       {openSignOut ? (

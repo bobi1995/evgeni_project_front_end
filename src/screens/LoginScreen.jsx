@@ -13,9 +13,8 @@ import AlertBox from "../components/AlertBox";
 import history from "../components/history";
 import apiAddress from "../globals/apiAddress";
 import { makeStyles } from "@mui/styles";
+import DialogLoader from "../components/DialogLoader";
 
-import { useLazyQuery } from "@apollo/client";
-import { LOGIN } from "../graphql/queries";
 const useStyles = makeStyles({
   paperStyle: { padding: 20, width: 280, margin: "10% auto" },
 
@@ -34,31 +33,38 @@ const useStyles = makeStyles({
 
 const LoginForm = () => {
   const classes = useStyles();
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
-  const [getLogin, { loading, error, data }] = useLazyQuery(LOGIN, {
-    onError: (err) => {
-      console.log(err);
-      setAlertMessage(
-        "Could not perform login in. Please try again or contact us"
-      );
-    },
-  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const sendLoginRequest = () => {
+    setLoading(true);
 
-  const sendLoginRequest = async () => {
-    console.log("again");
-    const res = await getLogin({
-      variables: { email: user, password: password },
-    });
-
-    console.log(res);
-    if (res.data.login) {
-      console.log("here");
-      localStorage.setItem("userId", res.data.login.userId);
-      localStorage.setItem("token", res.data.login.token);
-      history.push("/home");
-    }
+    axios({
+      method: "post",
+      url: `${apiAddress}/login`,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      data: {
+        email,
+        password,
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          localStorage.setItem("userId", res.data.userId);
+          localStorage.setItem("token", res.data.token);
+          history.push("/profile");
+        }
+      })
+      .catch((e) => {
+        setLoading(false);
+        setSuccess(false);
+        setAlertMessage("Грешен потребител или парола");
+      });
   };
 
   return (
@@ -74,7 +80,7 @@ const LoginForm = () => {
           label="Потребител"
           placeholder="Въведи потребител"
           fullWidth
-          onChange={(text) => setUser(text.target.value)}
+          onChange={(text) => setEmail(text.target.value)}
         />
         <TextField
           label="Парола"
@@ -107,6 +113,7 @@ const LoginForm = () => {
           display={setAlertMessage}
         />
       ) : null}
+      {loading ? <DialogLoader /> : null}
     </Grid>
   );
 };

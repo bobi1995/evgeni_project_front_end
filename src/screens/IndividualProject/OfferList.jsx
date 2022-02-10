@@ -15,13 +15,12 @@ import { Button, Divider } from "@mui/material";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import apiAddress from "../globals/apiAddress";
 import axios from "axios";
-import fileDownload from "js-file-download";
-import shareServer from "../globals/shareServer";
+import FileBase64 from "react-file-base64";
 
 export default function ListComponent(props) {
-  const onChange = (event) => {
-    props.uploadFunction(event.target.files[0]);
-  };
+  // const [selectedFile, setSelectedFile] = useState(null);
+  // const [results, setResults] = useState(null);
+  // const [alertMessage, setAlertMessage] = useState("");
 
   return (
     <Box sx={{ flexGrow: 1, maxWidth: 500 }}>
@@ -34,24 +33,13 @@ export default function ListComponent(props) {
             {props.data.length > 0 ? (
               props.data.map((el) => (
                 <ListItem
-                  key={el}
                   secondaryAction={
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => props.deleteFunction(el)}
-                    >
+                    <IconButton edge="end" aria-label="delete">
                       <DeleteIcon />
                     </IconButton>
                   }
                 >
-                  <ListItemAvatar
-                    onClick={async () =>
-                      window.open(
-                        `${shareServer}\\${props.projectId}\\${props.category}\\${el}`
-                      )
-                    }
-                  >
+                  <ListItemAvatar>
                     <Avatar>
                       <FolderIcon />
                     </Avatar>

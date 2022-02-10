@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
+import SideBar from "../components/SideBar";
 
 function PrivateRoute({ component: Component, ...rest }) {
   return (
@@ -7,7 +8,9 @@ function PrivateRoute({ component: Component, ...rest }) {
       {...rest}
       render={function (props) {
         return localStorage.getItem("token") ? (
-          <Component {...props} />
+          <SideBar>
+            <Component {...props} />
+          </SideBar>
         ) : (
           <Redirect to="/" />
         );
