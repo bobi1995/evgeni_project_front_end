@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, TextField, Button } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import apiAddress from "../globals/apiAddress";
 import axios from "axios";
@@ -18,6 +26,11 @@ import history from "../components/history";
 import SearchIcon from "@material-ui/icons/Search";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
+import AddIcon from "@material-ui/icons/Add";
+import Salary from "./IndividualUser/Salary";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import numeral from "numeral";
+import moment from "moment";
 
 const useStyles = makeStyles({
   container: {
@@ -33,6 +46,72 @@ const IndividualUserScreen = (props) => {
   const [alertMessage, setAlertMessage] = useState("");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(null);
+  const [openCost, setOpenCost] = useState(false);
+  const [costName, setCostName] = useState("");
+  const [costValue, setCostValue] = useState("");
+
+  const closeCost = () => {
+    setOpenCost(false);
+  };
+
+  const onChangeCostName = (e) => {
+    setCostName(e.target.value);
+  };
+
+  const onChangeCostValue = (e) => {
+    setCostValue(e.target.value);
+  };
+
+  const saveCost = () => {
+    axios({
+      method: "put",
+      url: `${apiAddress}/cost`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      data: {
+        otherCost: `${costName} - ${costValue}`,
+        userId: data._id,
+        userCostId: data.userCost._id,
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage(res.data);
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
+
+  const deleteCost = (costData) => {
+    axios({
+      method: "delete",
+      url: `${apiAddress}/cost`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      data: {
+        userCostId: data.userCost._id,
+        costData,
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage(res.data);
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -52,12 +131,18 @@ const IndividualUserScreen = (props) => {
         setAlertMessage("Потребителят не може да бъде зареден");
       });
   }, []);
-
+  console.log(data);
   return (
     <Box className={classes.container}>
       {data ? (
         <Box>
-          <Box style={{ display: "flex", justifyContent: "space-around" }}>
+          <Box
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              flexWrap: "wrap",
+            }}
+          >
             <Box>
               <Box style={{ marginTop: 10 }}>
                 <TextField
@@ -86,7 +171,24 @@ const IndividualUserScreen = (props) => {
                   disabled
                 />
               </Box>
-              <Box style={{ marginTop: 10 }}>
+
+              <Box style={{ marginTop: 10, textAlign: "center" }}>
+                <Button
+                  style={{
+                    backgroundColor: "#C0C0C0",
+                    color: "white",
+                    marginBottom: 10,
+                    margin: "1% auto",
+                    "&:hover": {
+                      color: "#C0C0C0	",
+                    },
+                  }}
+                  // onClick={handleClickOpen}
+                >
+                  Редактирай
+                </Button>
+              </Box>
+              <Box style={{ marginTop: 50 }}>
                 <TextField
                   label="Заплата"
                   className={classes.inputBox}
@@ -96,6 +198,12 @@ const IndividualUserScreen = (props) => {
                       : "Няма въведена"
                   }
                   disabled
+                />
+              </Box>
+              <Box style={{ marginTop: 10, textAlign: "center" }}>
+                <Salary
+                  userId={data._id}
+                  costId={data.userCost ? data.userCost._id : null}
                 />
               </Box>
             </Box>
@@ -134,7 +242,25 @@ const IndividualUserScreen = (props) => {
                   {
                     title: "Стойност",
                     field: "power",
-                    render: (rowData) => `${rowData.el.split(" - ")[1]} лв.`,
+                    render: (rowData) =>
+                      `${numeral(rowData.el.split(" - ")[1]).format(
+                        "0,0"
+                      )} лв.`,
+                    cellStyle: {
+                      width: "25%",
+                    },
+                  },
+                  {
+                    title: "Изтрий",
+                    field: "delete",
+                    render: (rowData) => (
+                      <Button onClick={() => deleteCost(`${rowData.el}`)}>
+                        <DeleteForeverIcon style={{ color: "red" }} />
+                      </Button>
+                    ),
+                    cellStyle: {
+                      textAlign: "center",
+                    },
                   },
                 ]}
                 data={
@@ -143,10 +269,17 @@ const IndividualUserScreen = (props) => {
                     : []
                 }
                 options={{
-                  exportButton: true,
                   sorting: false,
                   search: false,
                 }}
+                actions={[
+                  {
+                    icon: () => <AddIcon />,
+                    tooltip: "Добави разход",
+                    isFreeAction: true,
+                    onClick: (event) => setOpenCost(true),
+                  },
+                ]}
               />
             </Box>
             <Box>
@@ -172,19 +305,22 @@ const IndividualUserScreen = (props) => {
                 }}
                 columns={[
                   {
-                    title: "Разход",
-                    field: "salary",
+                    title: "Печалба",
+                    field: "totalProfit",
                     render: (rowData) => {
-                      return rowData.el.split(" - ")[0];
-                    },
-                    cellStyle: {
-                      width: "70%",
+                      console.log(rowData);
+                      return `${numeral(rowData.el.totalProfit).format(
+                        "0,0"
+                      )} лв.`;
                     },
                   },
                   {
-                    title: "Стойност",
-                    field: "power",
-                    render: (rowData) => `${rowData.el.split(" - ")[1]} лв.`,
+                    title: "Срок на покритие",
+                    field: "endDate",
+                    render: (rowData) =>
+                      moment(new Date(rowData.el.endDate)).format(
+                        "DD-MMM-yyyy"
+                      ),
                   },
                 ]}
                 data={data.results ? data.results.map((el) => ({ el })) : []}
@@ -269,6 +405,50 @@ const IndividualUserScreen = (props) => {
           display={setAlertMessage}
         />
       ) : null}
+      <Dialog
+        open={openCost}
+        onClose={closeCost}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="sm"
+        fullWidth={true}
+      >
+        <DialogTitle id="alert-dialog-title" style={{ textAlign: "center" }}>
+          Добави разход
+        </DialogTitle>
+        <DialogContent
+          style={{ display: "flex", justifyContent: "space-around" }}
+        >
+          <Box>
+            <Box style={{ marginTop: 10 }}>
+              <TextField
+                id="outlined-name"
+                label="Разход"
+                className={classes.inputBox}
+                onChange={onChangeCostName}
+                value={costName}
+                required
+              />
+            </Box>
+            <Box style={{ marginTop: 10 }}>
+              <TextField
+                id="outlined-name"
+                label="Стойност"
+                className={classes.inputBox}
+                onChange={onChangeCostValue}
+                value={costValue}
+                required
+              />
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCost}>Откажи</Button>
+          <Button onClick={saveCost} autoFocus>
+            Запази
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

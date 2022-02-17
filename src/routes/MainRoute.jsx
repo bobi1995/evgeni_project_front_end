@@ -11,6 +11,7 @@ import CreateUserScreen from "../screens/CreateUserScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import CreateProjectScreen from "../screens/CreateProjectScreen";
 import IndividualUserScreen from "../screens/IndividualUser";
+import UsersScreen from "../screens/UsersScreen";
 const MainRoute = () => {
   return (
     <Router history={history}>
@@ -24,6 +25,7 @@ const MainRoute = () => {
           component={IndividualProject}
         />
         <PrivateRoute path="/user/:userId" component={IndividualUserScreen} />
+        <PrivateRoute path="/users" component={UsersScreen} />
       </Switch>
     </Router>
   );

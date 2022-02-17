@@ -57,7 +57,12 @@ const LoginForm = () => {
         if (res.status === 200) {
           localStorage.setItem("userId", res.data.userId);
           localStorage.setItem("token", res.data.token);
+          localStorage.setItem("admin", res.data.admin);
           history.push("/profile");
+        } else {
+          setLoading(false);
+          setSuccess(false);
+          setAlertMessage("Грешен потребител или парола");
         }
       })
       .catch((e) => {

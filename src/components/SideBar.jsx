@@ -1,26 +1,20 @@
 import SideNav, { NavItem, NavIcon, NavText } from "@trendmicro/react-sidenav";
 import "@trendmicro/react-sidenav/dist/react-sidenav.css";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import CardMembershipIcon from "@material-ui/icons/CardMembership";
-import SearchIcon from "@material-ui/icons/Search";
-import StarHalfIcon from "@material-ui/icons/StarHalf";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import YourProjects from "../screens/YourProjects";
-import ProfileScreen from "../screens/ProfileScreen";
-import CreateUserScreen from "../screens/CreateUserScreen";
 import React, { useState } from "react";
 import Header from "./Header";
 import SingOutBtn from "./SignOutBtn";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import IndividualProject from "../screens/IndividualProject";
-import CreateProjectScreen from "../screens/CreateProjectScreen";
+import PeopleIcon from "@material-ui/icons/People";
 import CreateNewFolderIcon from "@material-ui/icons/CreateNewFolder";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import history from "../components/history";
+import AlertBox from "./AlertBox";
 const SideBar = (props) => {
   const [selected, setSelected] = useState("Профил");
   const [expanded, setExpanded] = useState(false);
   const [openSignOut, setOpenSignOut] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   return (
     <div>
@@ -42,17 +36,31 @@ const SideBar = (props) => {
             <NavText>Профил</NavText>
           </NavItem>
           <NavItem
-            eventKey="Твоите Проекти"
-            onClick={() => history.push("/create-user")}
+            eventKey="Потребители"
+            onClick={() => {
+              if (localStorage.getItem("admin") === "true") {
+                history.push("/users");
+              } else
+                setAlertMessage(
+                  "Нямаш права за тази сесия. Обърни се към администратор."
+                );
+            }}
           >
             <NavIcon>
-              <DashboardIcon />
+              <PeopleIcon />
             </NavIcon>
-            <NavText>Твоите Проекти</NavText>
+            <NavText>Потребители</NavText>
           </NavItem>
           <NavItem
             eventKey="Създай Проект"
-            onClick={() => history.push("/create-project")}
+            onClick={() => {
+              if (localStorage.getItem("admin") === "true") {
+                history.push("/create-project");
+              } else
+                setAlertMessage(
+                  "Нямаш права за тази сесия. Обърни се към администратор."
+                );
+            }}
           >
             <NavIcon>
               <CreateNewFolderIcon />
@@ -61,7 +69,14 @@ const SideBar = (props) => {
           </NavItem>
           <NavItem
             eventKey="Създай Потребител"
-            onClick={() => history.push("/create-user")}
+            onClick={() => {
+              if (localStorage.getItem("admin") === "true") {
+                history.push("/create-user");
+              } else
+                setAlertMessage(
+                  "Нямаш права за тази сесия. Обърни се към администратор."
+                );
+            }}
           >
             <NavIcon>
               <PersonAddIcon />
@@ -97,6 +112,13 @@ const SideBar = (props) => {
           openSignOut={openSignOut}
           setOpenSignOut={setOpenSignOut}
           setSelected={setSelected}
+        />
+      ) : null}
+      {alertMessage ? (
+        <AlertBox
+          success={false}
+          text={alertMessage}
+          display={setAlertMessage}
         />
       ) : null}
     </div>

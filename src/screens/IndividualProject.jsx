@@ -15,6 +15,8 @@ import ListComponent from "../components/ListComponent";
 import Budget from "./IndividualProject/Budget";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
 import EditIcon from "@material-ui/icons/Edit";
+import EditProject from "./IndividualProject/EditProject";
+import GoogleMap from "./IndividualProject/GoogleMap";
 
 const useStyles = makeStyles({
   container: {
@@ -413,23 +415,8 @@ const IndividualProject = (props) => {
             />
             {data.name}
           </Typography>
-          <Button
-            style={{
-              marginTop: "1%",
-              textAlign: "center",
-              backgroundColor: "#C0C0C0",
-              color: "white",
-              width: "15rem",
-              marginBottom: 10,
+          <EditProject data={data} projectId={props.match.params.projectId} />
 
-              "&:hover": {
-                color: "#C0C0C0	",
-              },
-            }}
-          >
-            <EditIcon />
-            Редактирай Проект
-          </Button>
           <Box
             style={{
               display: "flex",
@@ -590,6 +577,7 @@ const IndividualProject = (props) => {
           <Box>
             <Budget projectId={data._id} data={data.budget} />
           </Box>
+          <GoogleMap address={data.location} />
         </Box>
       ) : null}
       {loading ? <DialogLoader /> : null}

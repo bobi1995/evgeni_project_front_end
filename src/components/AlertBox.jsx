@@ -26,7 +26,7 @@ const AlertBox = ({ text, display, success }) => {
       fullWidth={true}
     >
       <DialogTitle id="simple-dialog-title" style={{ textAlign: "center" }}>
-        Wealth Analytica System
+        Система за контрол на проекти
       </DialogTitle>
       <Divider />
 
