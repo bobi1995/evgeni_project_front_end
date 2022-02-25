@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Button, TextField, Box } from "@mui/material/";
+import {
+  Button,
+  TextField,
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material/";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -12,7 +20,7 @@ import axios from "axios";
 import DialogLoader from "../../components/DialogLoader";
 import AlertBox from "../../components/AlertBox";
 import EditIcon from "@material-ui/icons/Edit";
-
+import history from "../../components/history";
 const useStyles = makeStyles(() => ({
   containerStyle: {
     textAlign: "center",
@@ -22,26 +30,21 @@ const useStyles = makeStyles(() => ({
     width: 300,
   },
 }));
-export default function EditBudget(props) {
+export default function EditUser(props) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [power, setPower] = useState(props.data.power);
   const [name, setName] = useState(props.data.name);
-  const [location, setLocation] = useState(props.data.location);
-  const [type, setType] = useState(props.data.type);
+  const [email, setEmail] = useState(props.data.email);
+  const [type, setType] = useState(props.data.isAdmin);
   const [alertMessage, setAlertMessage] = useState("");
   const [loading, setLoading] = useState(null);
-
-  const onChangePower = (event) => {
-    setPower(event.target.value);
-  };
 
   const onChangeName = (event) => {
     setName(event.target.value);
   };
 
-  const onChangeLocation = (event) => {
-    setLocation(event.target.value);
+  const onChangeEmail = (event) => {
+    setEmail(event.target.value);
   };
 
   const onChangeType = (event) => {
@@ -56,16 +59,15 @@ export default function EditBudget(props) {
     setOpen(false);
   };
 
-  const saveRow = () => {
+  const saveUser = () => {
     axios({
-      method: "put",
-      url: `${apiAddress}/project`,
+      method: "post",
+      url: `${apiAddress}/user`,
       data: {
         name,
-        location,
-        power,
+        email,
         type,
-        projectId: props.projectId,
+        userId: props.userId,
       },
       headers: {
         Authorization: "Basic " + localStorage.getItem("token"),
@@ -75,7 +77,11 @@ export default function EditBudget(props) {
     })
       .then((res) => {
         if (res.status === 200) {
-          window.location.reload();
+          localStorage.setItem("admin", type);
+
+          if (type === true) {
+            window.location.reload();
+          } else history.push("/profile");
         } else setAlertMessage(res.data);
       })
       .catch((e) => {
@@ -85,24 +91,23 @@ export default function EditBudget(props) {
   };
 
   return (
-    <div style={{ marginRight: 10 }}>
+    <div>
       <Button
-        disabled={props.data.status === 2 ? true : false}
         style={{
           marginTop: "1%",
           textAlign: "center",
           backgroundColor: "#C0C0C0",
           color: "white",
-          width: "15rem",
+          width: "12rem",
           marginBottom: 10,
-          backgroundColor: "rgba(255,165,0,0.5)",
+
           "&:hover": {
             color: "#C0C0C0	",
           },
         }}
         onClick={handleClickOpen}
       >
-        <EditIcon /> Редактирай Проект
+        <EditIcon /> Редактирай
       </Button>
       <Dialog
         open={open}
@@ -112,7 +117,7 @@ export default function EditBudget(props) {
         maxWidth="xl"
       >
         <DialogTitle id="alert-dialog-title" style={{ textAlign: "center" }}>
-          Добави нова позиция
+          Редактирай Потребител
         </DialogTitle>
         <DialogContent
           style={{ display: "flex", justifyContent: "space-around" }}
@@ -130,28 +135,44 @@ export default function EditBudget(props) {
             <Box style={{ marginTop: 10 }}>
               <TextField
                 id="outlined-email"
-                label="Мощност"
+                label="Имейл"
                 className={classes.inputBox}
-                onChange={onChangePower}
-                value={power}
+                onChange={onChangeEmail}
+                value={email}
               />
             </Box>
             <Box style={{ marginTop: 10 }}>
-              <TextField
-                id="outlined-password"
-                label="Локация"
-                className={classes.inputBox}
-                onChange={onChangeLocation}
-                value={location}
-              />
+              <FormControl className={classes.inputBox}>
+                <InputLabel id="demo-simple-select-label">Тип</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={type}
+                  label="Админ"
+                  onChange={onChangeType}
+                >
+                  <MenuItem value={true}>Администратор</MenuItem>
+                  <MenuItem value={false}>Обикновен</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={saveRow} autoFocus>
+          <Button onClick={handleClose}>Откажи</Button>
+
+          <Button
+            onClick={saveUser}
+            style={{
+              position: "absolute",
+              left: 0,
+              color: "white",
+              backgroundColor: "green",
+              marginLeft: 10,
+            }}
+          >
             Запази
           </Button>
-          <Button onClick={handleClose}>Откажи</Button>
         </DialogActions>
       </Dialog>
       {loading ? <DialogLoader /> : null}

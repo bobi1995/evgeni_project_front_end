@@ -8,6 +8,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import PeopleIcon from "@material-ui/icons/People";
 import CreateNewFolderIcon from "@material-ui/icons/CreateNewFolder";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import ListAltIcon from "@material-ui/icons/ListAlt";
 import history from "../components/history";
 import AlertBox from "./AlertBox";
 const SideBar = (props) => {
@@ -25,6 +26,7 @@ const SideBar = (props) => {
         onToggle={(expanded) => setExpanded(expanded)}
         style={{
           position: "fixed",
+          backgroundColor: "#35AEB6",
         }}
       >
         <SideNav.Toggle />
@@ -51,6 +53,24 @@ const SideBar = (props) => {
             </NavIcon>
             <NavText>Потребители</NavText>
           </NavItem>
+
+          <NavItem
+            eventKey="Проекти"
+            onClick={() => {
+              if (localStorage.getItem("admin") === "true") {
+                history.push("/projects");
+              } else
+                setAlertMessage(
+                  "Нямаш права за тази сесия. Обърни се към администратор."
+                );
+            }}
+          >
+            <NavIcon>
+              <ListAltIcon />
+            </NavIcon>
+            <NavText>Проекти</NavText>
+          </NavItem>
+
           <NavItem
             eventKey="Създай Проект"
             onClick={() => {
@@ -84,11 +104,11 @@ const SideBar = (props) => {
             <NavText>Създай Потребител</NavText>
           </NavItem>
 
-          <NavItem eventKey="SingOut">
-            <NavIcon onClick={() => setOpenSignOut(true)}>
+          <NavItem eventKey="SingOut" onClick={() => setOpenSignOut(true)}>
+            <NavIcon>
               <ExitToAppIcon />
             </NavIcon>
-            <NavText onClick={() => setOpenSignOut(true)}>Излез</NavText>
+            <NavText>Излез</NavText>
           </NavItem>
         </SideNav.Nav>
       </SideNav>

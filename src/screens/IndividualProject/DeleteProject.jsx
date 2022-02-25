@@ -11,8 +11,8 @@ import { makeStyles } from "@mui/styles";
 import axios from "axios";
 import DialogLoader from "../../components/DialogLoader";
 import AlertBox from "../../components/AlertBox";
-import EditIcon from "@material-ui/icons/Edit";
-
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import history from "../../components/history";
 const useStyles = makeStyles(() => ({
   containerStyle: {
     textAlign: "center",
@@ -22,31 +22,12 @@ const useStyles = makeStyles(() => ({
     width: 300,
   },
 }));
-export default function EditBudget(props) {
+export default function DeleteProject(props) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [power, setPower] = useState(props.data.power);
-  const [name, setName] = useState(props.data.name);
-  const [location, setLocation] = useState(props.data.location);
-  const [type, setType] = useState(props.data.type);
+
   const [alertMessage, setAlertMessage] = useState("");
   const [loading, setLoading] = useState(null);
-
-  const onChangePower = (event) => {
-    setPower(event.target.value);
-  };
-
-  const onChangeName = (event) => {
-    setName(event.target.value);
-  };
-
-  const onChangeLocation = (event) => {
-    setLocation(event.target.value);
-  };
-
-  const onChangeType = (event) => {
-    setType(event.target.value);
-  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -56,15 +37,12 @@ export default function EditBudget(props) {
     setOpen(false);
   };
 
-  const saveRow = () => {
+  const deleteProject = () => {
+    setLoading(true);
     axios({
-      method: "put",
+      method: "delete",
       url: `${apiAddress}/project`,
       data: {
-        name,
-        location,
-        power,
-        type,
         projectId: props.projectId,
       },
       headers: {
@@ -74,8 +52,9 @@ export default function EditBudget(props) {
       },
     })
       .then((res) => {
+        setLoading(false);
         if (res.status === 200) {
-          window.location.reload();
+          history.push("/profile");
         } else setAlertMessage(res.data);
       })
       .catch((e) => {
@@ -85,71 +64,46 @@ export default function EditBudget(props) {
   };
 
   return (
-    <div style={{ marginRight: 10 }}>
+    <div style={{ marginLeft: 10 }}>
       <Button
-        disabled={props.data.status === 2 ? true : false}
         style={{
           marginTop: "1%",
           textAlign: "center",
           backgroundColor: "#C0C0C0",
           color: "white",
           width: "15rem",
+          backgroundColor: "rgba(255, 0, 0,1)",
           marginBottom: 10,
-          backgroundColor: "rgba(255,165,0,0.5)",
           "&:hover": {
-            color: "#C0C0C0	",
+            color: "#C0C0C0",
+            backgroundColor: "rgba(255, 0, 0,0.5)",
           },
         }}
         onClick={handleClickOpen}
       >
-        <EditIcon /> Редактирай Проект
+        <DeleteForeverIcon /> Изтрий проект
       </Button>
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        maxWidth="xl"
+        maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title" style={{ textAlign: "center" }}>
-          Добави нова позиция
+          Изтрий проект
         </DialogTitle>
         <DialogContent
           style={{ display: "flex", justifyContent: "space-around" }}
         >
-          <Box>
-            <Box style={{ marginTop: 10 }}>
-              <TextField
-                id="outlined-name"
-                label="Име"
-                className={classes.inputBox}
-                onChange={onChangeName}
-                value={name}
-              />
-            </Box>
-            <Box style={{ marginTop: 10 }}>
-              <TextField
-                id="outlined-email"
-                label="Мощност"
-                className={classes.inputBox}
-                onChange={onChangePower}
-                value={power}
-              />
-            </Box>
-            <Box style={{ marginTop: 10 }}>
-              <TextField
-                id="outlined-password"
-                label="Локация"
-                className={classes.inputBox}
-                onChange={onChangeLocation}
-                value={location}
-              />
-            </Box>
-          </Box>
+          Изтриването на проект автоматично значи, че той ще бъде премахнат
+          завинаги от базата данни, а със него и всички прикачени файлове,
+          редовете от бюджета, както и постигнатия резултат от потребителя (ако
+          той е затворен).
         </DialogContent>
         <DialogActions>
-          <Button onClick={saveRow} autoFocus>
-            Запази
+          <Button onClick={deleteProject} autoFocus>
+            Изтрий
           </Button>
           <Button onClick={handleClose}>Откажи</Button>
         </DialogActions>

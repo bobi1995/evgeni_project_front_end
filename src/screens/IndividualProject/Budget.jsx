@@ -24,7 +24,11 @@ export default function ListComponent(props) {
         }}
       >
         {props.data.length > 0 ? (
-          <BudgetTable data={props.data} projectId={props.projectId} />
+          <BudgetTable
+            data={props.data}
+            projectId={props.projectId}
+            status={props.status}
+          />
         ) : (
           <Typography
             sx={{ mt: 4, mb: 2 }}
@@ -36,7 +40,7 @@ export default function ListComponent(props) {
           </Typography>
         )}
       </Box>
-      <AddRow projectId={props.projectId} />
+      <AddRow projectId={props.projectId} status={props.status} />
     </Paper>
   );
 }

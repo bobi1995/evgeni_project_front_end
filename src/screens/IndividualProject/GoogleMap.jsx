@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
+import { Typography, Paper } from "@material-ui/core";
 
 const provider = new OpenStreetMapProvider();
 
@@ -32,9 +33,11 @@ const GoogleMap = ({ address }) => {
   useEffect(() => {
     findAddress();
   }, []);
-  console.log(lat, long);
   return (
-    <div style={{ marginBottom: 10, marginTop: 50 }}>
+    <Paper style={{ marginBottom: 10, marginTop: 50 }} elevation={10}>
+      <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+        {address}
+      </Typography>
       {lat === 0 || long === 0 ? null : (
         <MapContainer
           center={position}
@@ -53,7 +56,7 @@ const GoogleMap = ({ address }) => {
           </Marker>
         </MapContainer>
       )}
-    </div>
+    </Paper>
   );
 };
 

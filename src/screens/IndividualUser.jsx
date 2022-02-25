@@ -31,6 +31,7 @@ import Salary from "./IndividualUser/Salary";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import numeral from "numeral";
 import moment from "moment";
+import EditUser from "./IndividualUser/EditUser";
 
 const useStyles = makeStyles({
   container: {
@@ -49,6 +50,9 @@ const IndividualUserScreen = (props) => {
   const [openCost, setOpenCost] = useState(false);
   const [costName, setCostName] = useState("");
   const [costValue, setCostValue] = useState("");
+  const [totalCost, setTotalCost] = useState(0);
+  const [totalResult, setTotalResult] = useState(0);
+  const [results, setResults] = useState([]);
 
   const closeCost = () => {
     setOpenCost(false);
@@ -124,13 +128,48 @@ const IndividualUserScreen = (props) => {
       })
       .then((res) => {
         setData(res.data);
+        if (res.data && res.data.results) {
+          const current = res.data.results.filter(
+            (el) =>
+              new Date(el.endDate) > new Date() &&
+              el.period > 0.5 &&
+              new Date(el.startDate) <= new Date()
+          );
+          setResults(current);
+        }
+        //calculating total cost
+        if (res.data && res.data.userCost && res.data.userCost.others) {
+          let temp = 0;
+          res.data.userCost.others.map((el) => {
+            const parts = el.split(" - ");
+            temp = temp + parseFloat(parts[1]);
+          });
+          setTotalCost(temp + res.data.userCost.salary);
+        }
+
+        //calculating total profit
+        if (res.data && res.data.results) {
+          let temp = 0;
+          res.data.results.map((el) => {
+            if (
+              Math.round(el.period / 30) > 0 &&
+              new Date(el.endDate) > new Date() &&
+              new Date(el.startDate) <= new Date()
+            ) {
+              temp = temp + el.totalProfit / Math.round(el.period / 30);
+            }
+          });
+          setTotalResult(temp);
+        }
         setLoading(false);
       })
       .catch((err) => {
         setLoading(false);
+        console.log(err);
         setAlertMessage("Потребителят не може да бъде зареден");
       });
   }, []);
+
   console.log(data);
   return (
     <Box className={classes.container}>
@@ -173,20 +212,7 @@ const IndividualUserScreen = (props) => {
               </Box>
 
               <Box style={{ marginTop: 10, textAlign: "center" }}>
-                <Button
-                  style={{
-                    backgroundColor: "#C0C0C0",
-                    color: "white",
-                    marginBottom: 10,
-                    margin: "1% auto",
-                    "&:hover": {
-                      color: "#C0C0C0	",
-                    },
-                  }}
-                  // onClick={handleClickOpen}
-                >
-                  Редактирай
-                </Button>
+                <EditUser userId={props.match.params.userId} data={data} />
               </Box>
               <Box style={{ marginTop: 50 }}>
                 <TextField
@@ -308,7 +334,6 @@ const IndividualUserScreen = (props) => {
                     title: "Печалба",
                     field: "totalProfit",
                     render: (rowData) => {
-                      console.log(rowData);
                       return `${numeral(rowData.el.totalProfit).format(
                         "0,0"
                       )} лв.`;
@@ -323,7 +348,7 @@ const IndividualUserScreen = (props) => {
                       ),
                   },
                 ]}
-                data={data.results ? data.results.map((el) => ({ el })) : []}
+                data={results ? results.map((el) => ({ el })) : []}
                 options={{
                   exportButton: true,
                   sorting: false,
@@ -331,6 +356,29 @@ const IndividualUserScreen = (props) => {
                 }}
               />
             </Box>
+          </Box>
+          <Box
+            style={{
+              justifyContent: "center",
+              display: "flex",
+              marginTop: 30,
+            }}
+          >
+            <TextField
+              style={{ marginRight: 5 }}
+              label="Месечен разход"
+              value={
+                totalCost ? `${numeral(totalCost).format("0,0.00")} лв.` : ""
+              }
+              disabled
+            />
+            <TextField
+              prefix="лв."
+              style={{ marginLeft: 5 }}
+              label="Месечен приход"
+              value={`${numeral(totalResult).format("0,0.00")} лв.`}
+              disabled
+            />
           </Box>
 
           <Box>
@@ -387,7 +435,68 @@ const IndividualUserScreen = (props) => {
                   ),
                 },
               ]}
-              data={data.projects.map((el) => ({ ...el }))}
+              data={data.projects.filter((el) => el.status !== 2)}
+              options={{
+                exportButton: true,
+                sorting: false,
+                search: false,
+              }}
+            />
+
+            <MaterialTable
+              style={{ marginTop: 30 }}
+              title="Затворени проекти"
+              icons={{
+                Filter: React.forwardRef((props, ref) => (
+                  <SearchIcon ref={ref} />
+                )),
+                Search: React.forwardRef((props, ref) => (
+                  <SearchIcon ref={ref} />
+                )),
+                ResetSearch: React.forwardRef((props, ref) => (
+                  <RotateLeftIcon ref={ref} />
+                )),
+                SortArrow: ArrowUpward,
+                FirstPage: FirstPage,
+                LastPage: LastPage,
+                NextPage: ChevronRight,
+                PreviousPage: ChevronLeft,
+                Export: GetApp,
+              }}
+              columns={[
+                { title: "Име", field: "name" },
+                {
+                  title: "Мощност",
+                  field: "power",
+                  render: (rowData) => `${rowData.power} kw/h`,
+                },
+                {
+                  title: "Статус",
+                  field: "status",
+                  render: (rowData) => (
+                    <FiberManualRecordIcon
+                      style={
+                        rowData.status === 0
+                          ? { color: "red" }
+                          : rowData.status === 1
+                          ? { color: "yellow" }
+                          : { color: "green" }
+                      }
+                    />
+                  ),
+                },
+                {
+                  title: "Отвори",
+                  render: (rowData) => (
+                    <Button
+                      onClick={() => history.push(`/project/${rowData._id}`)}
+                    >
+                      Отвори
+                    </Button>
+                  ),
+                },
+              ]}
+              data={data.projects.filter((el) => el.status === 2)}
               options={{
                 exportButton: true,
                 sorting: false,

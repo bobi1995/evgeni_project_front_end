@@ -25,7 +25,12 @@ export default function ListComponent(props) {
 
   return (
     <Box sx={{ flexGrow: 1, maxWidth: 500 }}>
-      <Paper>
+      <Paper
+        style={{
+          backgroundColor:
+            props.data.length > 0 ? "rgba(0,128,0,0.5)" : "rgba(255,0,0,0.5)",
+        }}
+      >
         <Grid item>
           <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
             {props.heading}
@@ -40,6 +45,11 @@ export default function ListComponent(props) {
                       edge="end"
                       aria-label="delete"
                       onClick={() => props.deleteFunction(el)}
+                      disabled={
+                        props.status === 2 || props.heading === "График"
+                          ? true
+                          : false
+                      }
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -67,7 +77,12 @@ export default function ListComponent(props) {
           {/* <Button startIcon={<CloudUploadIcon />} component="label">
             качи файл <input type="file" hidden onChange={upload} />
           </Button> */}
-          <input type="file" required onChange={onChange} />
+          <input
+            type="file"
+            required
+            onChange={onChange}
+            disabled={props.status === 2 ? true : false}
+          />
         </Grid>
       </Paper>
     </Box>

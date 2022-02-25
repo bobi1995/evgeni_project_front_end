@@ -11,6 +11,7 @@ import {
 import numeral from "numeral";
 import { makeStyles } from "@mui/styles";
 import EditRow from "./EditRow";
+import Documents from "./Documents";
 
 const useStyles = makeStyles({
   tableBox: {
@@ -26,7 +27,7 @@ const useStyles = makeStyles({
   },
 });
 
-const BudgetTable = ({ data, projectId }) => {
+const BudgetTable = ({ data, projectId, status }) => {
   const classes = useStyles();
   const [pageWa, setPageWa] = React.useState(0);
   const [rowsPerPageWa, setRowsPerPageWa] = React.useState(10);
@@ -36,8 +37,8 @@ const BudgetTable = ({ data, projectId }) => {
 
   useEffect(() => {
     data.map((el) => {
-      totalSingle = el.singlePrice + totalSingle;
-      totalAgreed = el.agreedPrice + totalAgreed;
+      totalSingle = el.singlePrice * el.quantity + totalSingle;
+      totalAgreed = el.agreedPrice * el.quantity + totalAgreed;
       totalDifference = el.difference + totalDifference;
     });
 
@@ -99,6 +100,9 @@ const BudgetTable = ({ data, projectId }) => {
                   Доставчик
                 </TableCell>
                 <TableCell style={{ color: "white", fontWeight: "bold" }}>
+                  Документи
+                </TableCell>
+                <TableCell style={{ color: "white", fontWeight: "bold" }}>
                   Редакция
                 </TableCell>
               </TableRow>
@@ -120,7 +124,6 @@ const BudgetTable = ({ data, projectId }) => {
                       style={{
                         backgroundColor: row.total ? "#FF9999" : "#FF6666",
                         color: "white",
-                        width: "20%",
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
                         overflow: "hidden",
@@ -133,14 +136,9 @@ const BudgetTable = ({ data, projectId }) => {
                         {row.position}
                       </p>
                     </TableCell>
-                    <TableCell
-                      style={{
-                        width: "20%",
-                      }}
-                    >
+                    <TableCell>
                       <p className={classes.rowStyle}>{row.size}</p>
                     </TableCell>
-
                     <TableCell>{row.quantity}</TableCell>
                     <TableCell
                       style={
@@ -171,7 +169,16 @@ const BudgetTable = ({ data, projectId }) => {
                     <TableCell>{row.provider}</TableCell>
                     <TableCell>
                       {row.total ? null : (
-                        <EditRow rowData={row} projectId={projectId} />
+                        <Documents rowData={row} projectId={projectId} />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {row.total ? null : (
+                        <EditRow
+                          rowData={row}
+                          projectId={projectId}
+                          status={status}
+                        />
                       )}
                     </TableCell>
                   </TableRow>

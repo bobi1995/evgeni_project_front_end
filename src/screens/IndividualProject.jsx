@@ -17,6 +17,9 @@ import Brightness1Icon from "@material-ui/icons/Brightness1";
 import EditIcon from "@material-ui/icons/Edit";
 import EditProject from "./IndividualProject/EditProject";
 import GoogleMap from "./IndividualProject/GoogleMap";
+import CloseProject from "./IndividualProject/CloseProject";
+import DeleteProject from "./IndividualProject/DeleteProject";
+import numeral from "numeral";
 
 const useStyles = makeStyles({
   container: {
@@ -49,20 +52,51 @@ const IndividualProject = (props) => {
         setData(res.data);
         setContractSum(res.data.contractSum);
         setTotalProfit(res.data.totalProfit);
+
         if (res.data.budget.length > 0) {
           let temp = 0;
 
-          res.data.budget.map((el) => (temp = parseInt(el.agreedPrice) + temp));
+          res.data.budget.map((el) => {
+            if (el.total) {
+              return null;
+            } else return (temp = el.agreedPrice * el.quantity + temp);
+          });
           setTotalBudget(temp);
         }
         setLoading(false);
       })
       .catch((err) => {
         setLoading(false);
-        console.log(err);
         setAlertMessage("Потребителят не може да бъде зареден");
       });
   }, []);
+
+  const editProfit = () => {
+    axios({
+      method: "put",
+      url: `${apiAddress}/project`,
+      data: {
+        projectId: props.match.params.projectId,
+        contractSum,
+        totalProfit:
+          data.type === "3" ? contractSum - totalBudget : totalProfit,
+      },
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage(res.data);
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
 
   const uploadOffer = (selectedFile) => {
     // Create an object of formData
@@ -370,28 +404,26 @@ const IndividualProject = (props) => {
       });
   };
 
-  const editProfit = () => {
+  const uploadStandpoint = (selectedFile) => {
+    // Create an object of formData
+    const formData = new FormData();
+    // Update the formData object
+    formData.append("projectId", props.match.params.projectId);
+    formData.append("standpoint", selectedFile, selectedFile.name);
+
     axios({
-      method: "put",
-      url: `${apiAddress}/project`,
-      data: {
-        projectId: props.match.params.projectId,
-        contractSum,
-        totalProfit:
-          data.type === "3"
-            ? parseInt(contractSum) - parseInt(totalBudget)
-            : totalProfit,
-      },
+      method: "post",
+      url: `${apiAddress}/project/standpoint`,
       headers: {
         Authorization: "Basic " + localStorage.getItem("token"),
         "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
       },
+      data: formData,
     })
       .then((res) => {
         if (res.status === 200) {
           window.location.reload();
-        } else setAlertMessage(res.data);
+        } else setAlertMessage("Възникна проблем с качването на файла");
       })
       .catch((e) => {
         setLoading(false);
@@ -399,6 +431,132 @@ const IndividualProject = (props) => {
       });
   };
 
+  const deleteStandpoint = (selectedFile) => {
+    axios({
+      method: "delete",
+      url: `${apiAddress}/project/standpoint`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+      },
+      data: {
+        fileName: selectedFile,
+        projectId: props.match.params.projectId,
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage("Възникна проблем с изтриването на файла");
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
+
+  const uploadPermission = (selectedFile) => {
+    // Create an object of formData
+    const formData = new FormData();
+    // Update the formData object
+    formData.append("projectId", props.match.params.projectId);
+    formData.append("permission", selectedFile, selectedFile.name);
+
+    axios({
+      method: "post",
+      url: `${apiAddress}/project/permission`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+      },
+      data: formData,
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage("Възникна проблем с качването на файла");
+      })
+      .catch((e) => {
+        console.log(e);
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
+
+  const deletePermission = (selectedFile) => {
+    axios({
+      method: "delete",
+      url: `${apiAddress}/project/permission`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+      },
+      data: {
+        fileName: selectedFile,
+        projectId: props.match.params.projectId,
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage("Възникна проблем с изтриването на файла");
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
+
+  const uploadProjectDocs = (selectedFile) => {
+    // Create an object of formData
+    const formData = new FormData();
+    // Update the formData object
+    formData.append("projectId", props.match.params.projectId);
+    formData.append("projectDocs", selectedFile, selectedFile.name);
+
+    axios({
+      method: "post",
+      url: `${apiAddress}/project/projectDocs`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+      },
+      data: formData,
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage("Възникна проблем с качването на файла");
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
+
+  const deleteProjectDocs = (selectedFile) => {
+    axios({
+      method: "delete",
+      url: `${apiAddress}/project/projectDocs`,
+      headers: {
+        Authorization: "Basic " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+      },
+      data: {
+        fileName: selectedFile,
+        projectId: props.match.params.projectId,
+      },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        } else setAlertMessage("Възникна проблем с изтриването на файла");
+      })
+      .catch((e) => {
+        setLoading(false);
+        setAlertMessage(e);
+      });
+  };
   return (
     <Box className={classes.container}>
       {data ? (
@@ -415,8 +573,16 @@ const IndividualProject = (props) => {
             />
             {data.name}
           </Typography>
-          <EditProject data={data} projectId={props.match.params.projectId} />
-
+          <Box style={{ display: "flex", justifyContent: "center" }}>
+            <EditProject data={data} projectId={props.match.params.projectId} />
+            <CloseProject
+              projectId={props.match.params.projectId}
+              data={data}
+            />
+            {localStorage.getItem("admin") === "true" ? (
+              <DeleteProject projectId={props.match.params.projectId} />
+            ) : null}
+          </Box>
           <Box
             style={{
               display: "flex",
@@ -464,6 +630,7 @@ const IndividualProject = (props) => {
               display: "flex",
               justifyContent: "space-around",
               marginTop: 30,
+              flexWrap: "wrap",
             }}
           >
             <ListComponent
@@ -473,6 +640,7 @@ const IndividualProject = (props) => {
               uploadFunction={uploadOffer}
               deleteFunction={deleteOffer}
               category="offer"
+              status={data.status}
             />
 
             <ListComponent
@@ -482,6 +650,7 @@ const IndividualProject = (props) => {
               uploadFunction={uploadSchedule}
               deleteFunction={deleteSchedule}
               category="schedule"
+              status={data.status}
             />
 
             <ListComponent
@@ -491,6 +660,7 @@ const IndividualProject = (props) => {
               uploadFunction={uploadSimulation}
               deleteFunction={deleteSimulation}
               category="simulation"
+              status={data.status}
             />
           </Box>
 
@@ -500,6 +670,7 @@ const IndividualProject = (props) => {
               justifyContent: "space-around",
               marginTop: 30,
               marginBottom: 50,
+              flexWrap: "wrap",
             }}
           >
             <ListComponent
@@ -509,6 +680,7 @@ const IndividualProject = (props) => {
               uploadFunction={uploadContract}
               deleteFunction={deleteContract}
               category="contract"
+              status={data.status}
             />
 
             <ListComponent
@@ -518,6 +690,7 @@ const IndividualProject = (props) => {
               uploadFunction={uploadSubcontractor}
               deleteFunction={deleteSubcontractor}
               category="subcontractor"
+              status={data.status}
             />
 
             <ListComponent
@@ -527,6 +700,47 @@ const IndividualProject = (props) => {
               uploadFunction={uploadPictures}
               deleteFunction={deletePictures}
               category="pictures"
+              status={data.status}
+            />
+          </Box>
+
+          <Box
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              marginTop: 30,
+              marginBottom: 50,
+              flexWrap: "wrap",
+            }}
+          >
+            <ListComponent
+              heading="Становище"
+              data={data.standpoint}
+              projectId={data._id}
+              uploadFunction={uploadStandpoint}
+              deleteFunction={deleteStandpoint}
+              category="standpoint"
+              status={data.status}
+            />
+
+            <ListComponent
+              heading="Разрешително"
+              data={data.permission}
+              projectId={data._id}
+              uploadFunction={uploadPermission}
+              deleteFunction={deletePermission}
+              category="permission"
+              status={data.status}
+            />
+
+            <ListComponent
+              heading="Документи"
+              data={data.projectDocs}
+              projectId={data._id}
+              uploadFunction={uploadProjectDocs}
+              deleteFunction={deleteProjectDocs}
+              category="projectDocs"
+              status={data.status}
             />
           </Box>
           <Paper
@@ -551,11 +765,16 @@ const IndividualProject = (props) => {
               <TextField
                 disabled={data.type === "3" ? true : false}
                 label="Печалба"
-                value={data.totalProfit}
+                value={
+                  data.type === "3"
+                    ? numeral(data.totalProfit).format("0,0.00")
+                    : data.totalProfit
+                }
                 onChange={(e) => setTotalProfit(e.target.value)}
               />
             </Box>
             <Button
+              disabled={data.status === 2 ? true : false}
               style={{
                 marginTop: "1%",
                 textAlign: "center",
@@ -575,7 +794,11 @@ const IndividualProject = (props) => {
             </Button>
           </Paper>
           <Box>
-            <Budget projectId={data._id} data={data.budget} />
+            <Budget
+              projectId={data._id}
+              data={data.budget}
+              status={data.status}
+            />
           </Box>
           <GoogleMap address={data.location} />
         </Box>

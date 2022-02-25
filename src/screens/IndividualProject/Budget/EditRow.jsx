@@ -125,6 +125,7 @@ export default function EditRow(props) {
   return (
     <div>
       <Button
+        disabled={props.status === 2 ? true : false}
         style={{
           textAlign: "center",
           color: "white",

@@ -107,6 +107,7 @@ export default function AddRow(props) {
   return (
     <div>
       <Button
+        disabled={props.status === 2 ? true : false}
         style={{
           marginTop: "1%",
           textAlign: "center",

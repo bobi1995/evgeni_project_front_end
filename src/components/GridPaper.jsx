@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
     fontWeight: 700,
   },
   avatar: {
-    backgroundColor: "red",
+    backgroundColor: "#35AEB6",
     height: 56,
     width: 56,
   },
@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
   },
   differenceIcon: {
-    color: "red",
+    color: "#35AEB6",
   },
   differenceValue: {
     color: "red",
