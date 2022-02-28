@@ -104,7 +104,7 @@ const SideBar = (props) => {
             <NavText>Създай Потребител</NavText>
           </NavItem>
 
-          <NavItem eventKey="SingOut" onClick={() => setOpenSignOut(true)}>
+          <NavItem eventKey="Излез" onClick={() => setOpenSignOut(true)}>
             <NavIcon>
               <ExitToAppIcon />
             </NavIcon>

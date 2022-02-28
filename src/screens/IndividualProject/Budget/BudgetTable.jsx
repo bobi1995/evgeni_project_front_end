@@ -29,8 +29,8 @@ const useStyles = makeStyles({
 
 const BudgetTable = ({ data, projectId, status }) => {
   const classes = useStyles();
-  const [pageWa, setPageWa] = React.useState(0);
-  const [rowsPerPageWa, setRowsPerPageWa] = React.useState(10);
+  //const [pageWa, setPageWa] = React.useState(0);
+  // const [rowsPerPageWa, setRowsPerPageWa] = React.useState(10);
   let totalSingle = 0;
   let totalAgreed = 0;
   let totalDifference = 0;

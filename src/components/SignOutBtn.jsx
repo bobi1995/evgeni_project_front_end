@@ -18,7 +18,7 @@ export default function SingOutBtn(props) {
 
   const handleClose = () => {
     props.setOpenSignOut(false);
-    props.setSelected("Investment Dashboard");
+    props.setSelected("");
   };
 
   return (
