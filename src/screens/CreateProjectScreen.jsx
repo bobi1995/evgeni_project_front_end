@@ -75,6 +75,7 @@ const CreateProjectScreen = (props) => {
       },
     })
       .then((res) => {
+        setLoading(false);
         if (res.status === 200) {
           history.push(`/project/${res.data}`);
         }
