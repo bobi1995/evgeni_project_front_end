@@ -35,10 +35,25 @@ const SingleProject = (props) => {
       elevation={21}
       style={
         props.data.status === 0
-          ? { width: 350, marginTop: 30, backgroundColor: "red" }
+          ? {
+              width: 350,
+              marginTop: 30,
+              background:
+                "linear-gradient(to bottom right, rgba(255, 0, 0,0.9)	, rgba(255, 0, 0,0.2))",
+            }
           : props.data.status === 1
-          ? { width: 350, marginTop: 30, backgroundColor: "yellow" }
-          : { width: 350, marginTop: 30, backgroundColor: "green" }
+          ? {
+              width: 350,
+              marginTop: 30,
+              background:
+                "linear-gradient(to bottom right, rgba(245, 229, 27,0.9)	, rgba(245, 229, 27,0.2))",
+            }
+          : {
+              width: 350,
+              marginTop: 30,
+              background:
+                "linear-gradient(to bottom right, rgba(0,128,0,0.9)	, rgba(0,128,0,0.2))",
+            }
       }
     >
       <CardContent>

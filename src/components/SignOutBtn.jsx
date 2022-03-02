@@ -39,7 +39,7 @@ export default function SingOutBtn(props) {
         <DialogActions>
           <Button onClick={handleClose}>Не, остани</Button>
           <Button autoFocus onClick={confirmSignOut}>
-            <a href="http://localhost:3000" rel="noreferrer">
+            <a href="http://192.168.1.101" rel="noreferrer">
               Да, напусни
             </a>
           </Button>

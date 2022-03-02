@@ -67,6 +67,11 @@ const IndividualUserScreen = (props) => {
   };
 
   const saveCost = () => {
+    if (!data.userCost) {
+      return setAlertMessage(
+        "Първо трябва да въведеш основна заплата преди допълнителните разходи"
+      );
+    }
     axios({
       method: "put",
       url: `${apiAddress}/cost`,
@@ -170,7 +175,6 @@ const IndividualUserScreen = (props) => {
       });
   }, []);
 
-  console.log(data);
   return (
     <Box className={classes.container}>
       {data ? (
@@ -182,8 +186,8 @@ const IndividualUserScreen = (props) => {
               flexWrap: "wrap",
             }}
           >
-            <Box>
-              <Box style={{ marginTop: 10 }}>
+            <Box style={{ width: "25%" }}>
+              <Box style={{ marginTop: 10, textAlign: "center" }}>
                 <TextField
                   label="Име"
                   className={classes.inputBox}
@@ -191,7 +195,7 @@ const IndividualUserScreen = (props) => {
                   disabled
                 />
               </Box>
-              <Box style={{ marginTop: 10 }}>
+              <Box style={{ marginTop: 10, textAlign: "center" }}>
                 <TextField
                   label="Имейл"
                   type="email"
@@ -200,7 +204,7 @@ const IndividualUserScreen = (props) => {
                   disabled
                 />
               </Box>
-              <Box style={{ marginTop: 10 }}>
+              <Box style={{ marginTop: 10, textAlign: "center" }}>
                 <TextField
                   label="Тип"
                   className={classes.inputBox}
@@ -214,7 +218,7 @@ const IndividualUserScreen = (props) => {
               <Box style={{ marginTop: 10, textAlign: "center" }}>
                 <EditUser userId={props.match.params.userId} data={data} />
               </Box>
-              <Box style={{ marginTop: 50 }}>
+              <Box style={{ marginTop: 50, textAlign: "center" }}>
                 <TextField
                   label="Заплата"
                   className={classes.inputBox}
@@ -233,9 +237,9 @@ const IndividualUserScreen = (props) => {
                 />
               </Box>
             </Box>
-            <Box>
+            <Box style={{ width: "30%" }}>
               <MaterialTable
-                style={{ width: 400 }}
+                style={{ width: "100%" }}
                 title="Допълнителни разходи"
                 icons={{
                   Filter: React.forwardRef((props, ref) => (
@@ -308,9 +312,9 @@ const IndividualUserScreen = (props) => {
                 ]}
               />
             </Box>
-            <Box>
+            <Box style={{ width: "30%" }}>
               <MaterialTable
-                style={{ width: 400 }}
+                style={{ width: "100%" }}
                 title="Рeзултати"
                 icons={{
                   Filter: React.forwardRef((props, ref) => (
@@ -553,7 +557,11 @@ const IndividualUserScreen = (props) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeCost}>Откажи</Button>
-          <Button onClick={saveCost} autoFocus>
+          <Button
+            onClick={saveCost}
+            autoFocus
+            disabled={!costValue || !costName}
+          >
             Запази
           </Button>
         </DialogActions>

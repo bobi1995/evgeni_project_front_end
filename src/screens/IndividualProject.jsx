@@ -20,6 +20,7 @@ import GoogleMap from "./IndividualProject/GoogleMap";
 import CloseProject from "./IndividualProject/CloseProject";
 import DeleteProject from "./IndividualProject/DeleteProject";
 import numeral from "numeral";
+import PicturesGallery from "./IndividualProject/PicturesGallery";
 
 const useStyles = makeStyles({
   container: {
@@ -353,12 +354,22 @@ const IndividualProject = (props) => {
       });
   };
 
-  const uploadPictures = (selectedFile) => {
+  const uploadPictures = (event) => {
     // Create an object of formData
     const formData = new FormData();
+    const selectedFile = event.target.files;
+    console.log(selectedFile);
     // Update the formData object
     formData.append("projectId", props.match.params.projectId);
-    formData.append("pictures", selectedFile, selectedFile.name);
+
+    if (selectedFile.length < 1) {
+      return null;
+    }
+
+    for (let i = 0; i < selectedFile.length; i++) {
+      console.log(selectedFile[i]);
+      formData.append(`pictures`, selectedFile[i], selectedFile[i].name);
+    }
 
     axios({
       method: "post",
@@ -693,7 +704,7 @@ const IndividualProject = (props) => {
               status={data.status}
             />
 
-            <ListComponent
+            {/* <ListComponent
               heading="Снимки"
               data={data.pictures}
               projectId={data._id}
@@ -701,7 +712,7 @@ const IndividualProject = (props) => {
               deleteFunction={deletePictures}
               category="pictures"
               status={data.status}
-            />
+            /> */}
           </Box>
 
           <Box
@@ -743,6 +754,7 @@ const IndividualProject = (props) => {
               status={data.status}
             />
           </Box>
+
           <Paper
             elevation={10}
             style={{
@@ -758,7 +770,9 @@ const IndividualProject = (props) => {
               }}
             >
               <TextField
-                label="Сума по контракт"
+                label={
+                  data.type === "2" ? "Сума за финансиране" : "Сума по контракт"
+                }
                 value={contractSum ? contractSum : ""}
                 onChange={(e) => setContractSum(e.target.value)}
               />
@@ -800,6 +814,12 @@ const IndividualProject = (props) => {
               status={data.status}
             />
           </Box>
+          <PicturesGallery
+            projectId={data._id}
+            images={data.pictures}
+            uploadPictures={uploadPictures}
+            deletePictures={deletePictures}
+          />
           <GoogleMap address={data.location} />
         </Box>
       ) : null}

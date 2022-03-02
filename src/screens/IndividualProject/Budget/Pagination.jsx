@@ -7,7 +7,7 @@ const Pagination = ({
   counter,
   setRowsPerPage,
   rowsPerPage,
-  rowsPerPageOptions = [5, 10, 20],
+  //rowsPerPageOptions = [5, 10, 20],
 }) => {
   const handleChange = (event, newPage) => {
     setPage(newPage);
@@ -18,7 +18,8 @@ const Pagination = ({
   };
   return (
     <TablePagination
-      rowsPerPageOptions={rowsPerPageOptions}
+      //rowsPerPageOptions={rowsPerPageOptions}
+      rowsPerPageOptions={false}
       component="div"
       count={counter}
       rowsPerPage={rowsPerPage}
